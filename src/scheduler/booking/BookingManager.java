@@ -10,7 +10,7 @@ import scheduler.rules.IConflictRules;
 /**
  * Singleton
  */
-public class BookingManager {
+public class BookingManager implements BookingSubject {
 
     private static BookingManager instance;
 
@@ -89,17 +89,20 @@ public class BookingManager {
 
     // Observer support --------
 
+    @Override
     public void register(BookingObserver o) {
         if (o != null && !observers.contains(o)) {
             observers.add(o);
         }
     }
 
+    @Override
     public void unregister(BookingObserver o) {
         observers.remove(o);
     }
 
-    private void notifyObservers() {
+    @Override
+    public void notifyObservers() {
         for (BookingObserver o : new ArrayList<BookingObserver>(observers)) {
             o.onBookingsChanged();
         }
