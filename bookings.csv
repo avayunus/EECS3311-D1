@@ -2,6 +2,6 @@ id,roomId,userId,startHour,endHour
 b1,LAS1004,ayunus,9,10
 b2,LAS2005,trobel,13,15
 b3,LAS1003,asabu,12,14
-b4,LAS1004,hmalik,3,7
-b5,LAS1005,aaleem,4,15
-b6,LAS1006,crosel,15,17
+b4,LAS1005,hmalik,3,7
+b5,LAS1006,aaleem,10,12
+b6,LAS1004,crosel,15,17

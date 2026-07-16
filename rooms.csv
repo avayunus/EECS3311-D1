@@ -1,7 +1,7 @@
-id,name,capacity,building
-LAS1004,Seminar Room A,12,Lassonde
-LAS2005,Conference Room B,24,Lassonde
-LAS1003,Math Room,48,Lassonde
-LAS1004,English Room,32,Lassonde
-LAS1007,Lounge,12,Lassonde
-LAS1006,Science Lab,6,Lassonde
+id,name,capacity,building,status
+LAS1003,Math Room,48,Lassonde,AVAILABLE
+LAS1004,Seminar Room A,12,Lassonde,AVAILABLE
+LAS1005,English Room,32,Lassonde,AVAILABLE
+LAS1006,Science Lab,6,Lassonde,AVAILABLE
+LAS1007,Lounge,12,Lassonde,MAINTENANCE
+LAS2005,Conference Room B,24,Lassonde,AVAILABLE
