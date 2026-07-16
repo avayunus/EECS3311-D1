@@ -1,0 +1,7 @@
+id,email,password,accountType,orgOrStudentId,verified
+ayunus,ayunus@yorku.ca,Abcd123!,faculty,218873471,true
+trobel,trobel@yorku.ca,XyZ9#pass,student,220532479,true
+asabu,asabu@yorku.ca,Str0ng!pw,student,219139476,true
+hmalik,hmalik@yorku.ca,H@ider99,staff,220400297,true
+aaleem,aaleem@yorku.ca,Alee#2026,faculty,219027945,true
+crosel,crosel@yorku.ca,Chr!st99,partner,218748939,true
