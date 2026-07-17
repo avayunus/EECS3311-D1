@@ -8,7 +8,14 @@ import scheduler.model.Booking;
 import scheduler.rules.IConflictRules;
 
 /**
- * Singleton
+ * Singleton 
+ *
+ * There's one list of bookings and it saves to bookings.csv. If every view made
+ * its own manager they'd each load their own copy and overwrite each other, and
+ * conflict checking would break since neither one could see the other's
+ * bookings
+ *
+ * Lazy init  
  */
 public class BookingManager implements BookingSubject {
 
@@ -20,6 +27,7 @@ public class BookingManager implements BookingSubject {
     private IBookingRepository repo;
     private IConflictRules rules;
 
+    // private so nobody can make a second one
     private BookingManager() {
     }
 
@@ -30,10 +38,8 @@ public class BookingManager implements BookingSubject {
         return instance;
     }
 
-    /**
-     * Called from Main at startup
-   
-     */
+    // call once at startup. repo and rules get passed in so this class
+    // doesn't care that we're using CSV
     public void initialize(IBookingRepository repo, IConflictRules rules) {
         this.repo = repo;
         this.rules = rules;
@@ -42,9 +48,7 @@ public class BookingManager implements BookingSubject {
         notifyObservers();
     }
 
-    /**
-     * Rejects the booking if it conflicts with an existing one
-     */
+    // false if it clashes with an existing booking
     public boolean addBooking(Booking b) {
         requireInitialized();
         if (b == null) {
@@ -59,6 +63,7 @@ public class BookingManager implements BookingSubject {
         return true;
     }
 
+    // false if that id isn't there, so the caller knows nothing happened
     public boolean cancelBooking(String id) {
         requireInitialized();
         Booking found = findById(id);
@@ -71,9 +76,8 @@ public class BookingManager implements BookingSubject {
         return true;
     }
 
-    /**
-     * Returns a copy
-     */
+    // copy, not the real list - otherwise a view could edit bookings
+    // directly and skip the conflict check
     public List<Booking> getBookings() {
         return new ArrayList<Booking>(bookings);
     }
@@ -87,7 +91,7 @@ public class BookingManager implements BookingSubject {
         return null;
     }
 
-    // Observer support --------
+    // Observer stuff (BookingSubject)
 
     @Override
     public void register(BookingObserver o) {
@@ -101,6 +105,8 @@ public class BookingManager implements BookingSubject {
         observers.remove(o);
     }
 
+    // loop a copy, otherwise a view unregistering itself in its own callback
+    // blows up with ConcurrentModificationException
     @Override
     public void notifyObservers() {
         for (BookingObserver o : new ArrayList<BookingObserver>(observers)) {
