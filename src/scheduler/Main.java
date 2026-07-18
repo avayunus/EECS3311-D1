@@ -1,6 +1,7 @@
 package scheduler;
 
 import scheduler.data.CsvBookingRepository;
+import scheduler.data.CSVBookingAdapter;
 import scheduler.data.CsvRoomRepository;
 import scheduler.data.CsvUserRepository;
 import scheduler.facade.SchedulerFacade;
@@ -21,7 +22,7 @@ public class Main {
                 new CsvRoomRepository("rooms.csv"),
                 new CsvUserRepository("users.csv"));
 
-        facade.start(new CsvBookingRepository("bookings.csv"), new NoOverlapRule());
+        facade.start(new CSVBookingAdapter("bookings.csv"), new NoOverlapRule());
 
         System.out.println("=== Rooms (from rooms.csv) ===");
         for (Room room : facade.getRooms()) {
