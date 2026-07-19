@@ -9,6 +9,7 @@ import scheduler.data.IBookingRepository;
 import scheduler.data.IRoomRepository;
 import scheduler.data.IUserRepository;
 import scheduler.model.Booking;
+import scheduler.model.BookingFactory;
 import scheduler.model.Room;
 import scheduler.model.TimeSlot;
 import scheduler.model.User;
@@ -23,6 +24,8 @@ public class SchedulerFacade {
     private final BookingManager bookingManager;
     private final IRoomRepository roomRepository;
     private final IUserRepository userRepository;
+    private final BookingFactory bookingFactory = new BookingFactory();
+
 
     public SchedulerFacade(IRoomRepository roomRepository, IUserRepository userRepository) {
         this.bookingManager = BookingManager.getInstance();
@@ -51,8 +54,7 @@ public class SchedulerFacade {
             return false;
         }
         String bookingId = "b-" + UUID.randomUUID().toString().substring(0, 8);
-        Booking booking = new Booking(
-                bookingId,
+        Booking booking = bookingFactory.createBooking(
                 known.getId(),
                 userId,
                 slot.getStartHour(),
