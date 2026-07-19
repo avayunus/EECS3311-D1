@@ -80,5 +80,13 @@ public class Main {
 
         System.out.println("Final booking count (sample restored): "
                 + facade.getBookings().size());
+   
+        javax.swing.SwingUtilities.invokeLater(
+                () -> new scheduler.gui.BookingApp(facade).setVisible(true));
+        
     }
+
+
 }
+
+
