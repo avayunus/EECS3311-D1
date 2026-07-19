@@ -9,6 +9,8 @@ import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 
 import scheduler.model.Booking;
+import scheduler.model.BookingFactory;
+import scheduler.strategy.*;
 
 /**
  * CSV-backed booking store using the course javacsv library
@@ -34,12 +36,31 @@ public class CsvBookingRepository implements IBookingRepository {
             CsvReader reader = new CsvReader(path);
             reader.readHeaders();
             while (reader.readRecord()) {
+                String userType = reader.get("userType");
+                PricingStrategy strategy;
+                switch (userType.toLowerCase().trim()) {
+                    case "faculty":
+                        strategy = new FacultyPricingStrategy();
+                        break;
+                    case "staff":
+                        strategy = new StaffPricingStrategy();
+                        break;
+                    case "partner":
+                        strategy = new PartnerPricingStrategy();
+                        break;
+                    case "student":
+                    default:
+                        strategy = new StudentPricingStrategy();
+                        break;
+                }
+
                 Booking booking = new Booking(
                         reader.get("id"),
                         reader.get("roomId"),
                         reader.get("userId"),
                         Integer.parseInt(reader.get("startHour").trim()),
-                        Integer.parseInt(reader.get("endHour").trim()));
+                        Integer.parseInt(reader.get("endHour").trim()),
+                        strategy);
                 cache.add(booking);
             }
             reader.close();
@@ -56,6 +77,7 @@ public class CsvBookingRepository implements IBookingRepository {
             writer.write("userId");
             writer.write("startHour");
             writer.write("endHour");
+            writer.write("userType");
             writer.endRecord();
 
             for (Booking booking : cache) {
@@ -64,6 +86,14 @@ public class CsvBookingRepository implements IBookingRepository {
                 writer.write(booking.getUserId());
                 writer.write(String.valueOf(booking.getStartHour()));
                 writer.write(String.valueOf(booking.getEndHour()));
+                double rate = booking.getUpfrontDeposit();
+
+                String typeLabel = "student";
+                if (rate == 30.0) typeLabel = "faculty";
+                else if (rate == 40.0) typeLabel = "staff";
+                else if (rate == 50.0) typeLabel = "partner";
+
+                writer.write(typeLabel);
                 writer.endRecord();
             }
             writer.close();

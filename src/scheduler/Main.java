@@ -10,6 +10,9 @@ import scheduler.model.Room;
 import scheduler.model.TimeSlot;
 import scheduler.model.User;
 import scheduler.rules.NoOverlapRule;
+import scheduler.strategy.StudentPricingStrategy;
+import scheduler.strategy.FacultyPricingStrategy;
+import scheduler.strategy.PricingStrategy;
 
 /**
  * Demo entry point for Abel's Facade + CSV data layer.
@@ -42,25 +45,28 @@ public class Main {
         Room seminar = facade.findRoom("LAS1004");
         Room lounge = facade.findRoom("LAS1007");
 
+        PricingStrategy studentStrat = new StudentPricingStrategy();
+        PricingStrategy facultyStrat = new FacultyPricingStrategy();
+
         System.out.println("\n=== Facade booking checks ===");
         boolean overlapRejected = facade.requestBooking(
-                seminar, new TimeSlot(9, 11), "trobel");
+                seminar, new TimeSlot(9, 11), "trobel", studentStrat);
         System.out.println("Overlap on LAS1004 9-11: " + overlapRejected
                 + "  <- must be false (conflicts with b1 9-10)");
 
         boolean maintenanceRejected = facade.requestBooking(
-                lounge, new TimeSlot(10, 12), "asabu");
+                lounge, new TimeSlot(10, 12), "asabu", facultyStrat);
         System.out.println("Book MAINTENANCE lounge: " + maintenanceRejected
                 + "  <- must be false");
 
         boolean accepted = facade.requestBooking(
-                seminar, new TimeSlot(11, 13), "asabu");
+                seminar, new TimeSlot(11, 13), "asabu", facultyStrat);
         System.out.println("Book LAS1004 11-13: " + accepted
                 + "  <- must be true");
 
         System.out.println("\nBookings after successful add: " + facade.getBookings().size());
         for (Booking booking : facade.getBookings()) {
-            System.out.println("  " + booking);
+            System.out.println("  " + booking + " | Total Cost: $" + booking.calculateTotalCost() + " | Deposit: $" + booking.getUpfrontDeposit());
         }
 
         // Keep sample CSV clean: cancel whatever we just added for 11-13.

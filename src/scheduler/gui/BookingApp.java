@@ -98,7 +98,16 @@ public class BookingApp extends JFrame {
             return;
         }
 
-        boolean booked = facade.requestBooking(roomId, new TimeSlot(start, end), userId);
+        User selectedUser = facade.findUser(userId);
+
+        if (selectedUser == null) {
+            JOptionPane.showMessageDialog(this, "User not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        scheduler.strategy.PricingStrategy strategy = selectedUser.getPricingStrategy();
+
+        boolean booked = facade.requestBooking(roomId, new TimeSlot(start, end), userId, strategy);
 
         if (booked) {
             JOptionPane.showMessageDialog(this,

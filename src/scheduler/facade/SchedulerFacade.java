@@ -14,6 +14,7 @@ import scheduler.model.Room;
 import scheduler.model.TimeSlot;
 import scheduler.model.User;
 import scheduler.rules.IConflictRules;
+import scheduler.strategy.PricingStrategy;
 
 /**
  * Facade — single entry point the GUI (and Main) should call.
@@ -45,7 +46,7 @@ public class SchedulerFacade {
      * High-level book request used by the GUI (matches Ava's Singleton diagram).
      * Rejects disabled/maintenance rooms and delegates conflict checks to BookingManager.
      */
-    public boolean requestBooking(Room room, TimeSlot slot, String userId) {
+    public boolean requestBooking(Room room, TimeSlot slot, String userId, PricingStrategy strategy) {
         if (room == null || slot == null || userId == null || userId.isBlank()) {
             return false;
         }
@@ -58,13 +59,14 @@ public class SchedulerFacade {
                 known.getId(),
                 userId,
                 slot.getStartHour(),
-                slot.getEndHour());
+                slot.getEndHour(),
+                strategy);
         return bookingManager.addBooking(booking);
     }
 
     /** Convenience overload when the caller only has a room id. */
-    public boolean requestBooking(String roomId, TimeSlot slot, String userId) {
-        return requestBooking(roomRepository.findById(roomId), slot, userId);
+    public boolean requestBooking(String roomId, TimeSlot slot, String userId, PricingStrategy strategy) {
+        return requestBooking(roomRepository.findById(roomId), slot, userId, strategy);
     }
 
     public boolean cancelBooking(String bookingId) {

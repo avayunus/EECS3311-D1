@@ -1,12 +1,16 @@
 package scheduler.data;
 
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
+
 import scheduler.model.Booking;
+import scheduler.model.BookingFactory;
+import scheduler.strategy.*;
 
 /**
  * Aleena's Adapter / DAP implementation.
@@ -36,13 +40,31 @@ public class CSVBookingAdapter implements IBookingRepository {
             
             while (reader.readRecord()) {
                 // Adapting raw string record data into a clean Booking object
+                String userType = reader.get("userType");
+                PricingStrategy strategy;
+                switch (userType.toLowerCase().trim()) {
+                    case "faculty":
+                        strategy = new FacultyPricingStrategy();
+                        break;
+                    case "staff":
+                        strategy = new StaffPricingStrategy();
+                        break;
+                    case "partner":
+                        strategy = new PartnerPricingStrategy();
+                        break;
+                    case "student":
+                    default:
+                        strategy = new StudentPricingStrategy();
+                        break;
+                }
+
                 Booking booking = new Booking(
                         reader.get("id"),
                         reader.get("roomId"),
                         reader.get("userId"),
                         Integer.parseInt(reader.get("startHour").trim()),
-                        Integer.parseInt(reader.get("endHour").trim())
-                );
+                        Integer.parseInt(reader.get("endHour").trim()),
+                        strategy);
                 bookings.add(booking);
             }
             reader.close();
@@ -70,6 +92,7 @@ public class CSVBookingAdapter implements IBookingRepository {
             writer.write("userId");
             writer.write("startHour");
             writer.write("endHour");
+            writer.write("userType");
             writer.endRecord();
 
             for (Booking booking : currentBookings) {
@@ -78,6 +101,15 @@ public class CSVBookingAdapter implements IBookingRepository {
                 writer.write(booking.getUserId());
                 writer.write(String.valueOf(booking.getStartHour()));
                 writer.write(String.valueOf(booking.getEndHour()));
+
+                double rate = booking.getUpfrontDeposit();
+
+                String typeLabel = "student";
+                if (rate == 30.0) typeLabel = "faculty";
+                else if (rate == 40.0) typeLabel = "staff";
+                else if (rate == 50.0) typeLabel = "partner";
+
+                writer.write(typeLabel);
                 writer.endRecord();
             }
             writer.close();
@@ -98,6 +130,7 @@ public class CSVBookingAdapter implements IBookingRepository {
                 writer.write("userId");
                 writer.write("startHour");
                 writer.write("endHour");
+                writer.write("userType");
                 writer.endRecord();
 
                 for (Booking booking : currentBookings) {
@@ -106,6 +139,14 @@ public class CSVBookingAdapter implements IBookingRepository {
                     writer.write(booking.getUserId());
                     writer.write(String.valueOf(booking.getStartHour()));
                     writer.write(String.valueOf(booking.getEndHour()));
+                    double rate = booking.getUpfrontDeposit();
+
+                    String typeLabel = "student";
+                    if (rate == 30.0) typeLabel = "faculty";
+                    else if (rate == 40.0) typeLabel = "staff";
+                    else if (rate == 50.0) typeLabel = "partner";
+
+                    writer.write(typeLabel);
                     writer.endRecord();
                 }
                 writer.close();

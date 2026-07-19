@@ -1,6 +1,6 @@
 package scheduler.strategy;
 
-public class FacultyPricingStrategy {
+public class FacultyPricingStrategy  implements PricingStrategy{
     public double getHourlyRate (){
         return 30.0;
     }
