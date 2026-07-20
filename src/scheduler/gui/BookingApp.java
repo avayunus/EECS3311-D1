@@ -110,8 +110,25 @@ public class BookingApp extends JFrame {
         boolean booked = facade.requestBooking(roomId, new TimeSlot(start, end), userId, strategy);
 
         if (booked) {
+            int hours = end - start;
+            double hourlyRate = strategy.getHourlyRate();
+            double totalCost = strategy.calculateCost(hours);
+            double deposit = hourlyRate; // Assuming the upfront deposit equals 1 hour of room usage
+
+            String confirmationMessage = String.format(
+                    "Booking Confirmed!\n\n" +
+                            "Room: %s\n" +
+                            "User: %s (%s)\n" +
+                            "Time: %d:00 - %d:00 (%d hours)\n" +
+                            "-----------------------------------\n" +
+                            "Hourly Rate: $%.2f / hr\n" +
+                            "Upfront Deposit Due: $%.2f\n" +
+                            "Total Expected Cost: $%.2f",
+                    roomId, userId, selectedUser.getAccountType(), start, end, hours, hourlyRate, deposit, totalCost
+            );
+
             JOptionPane.showMessageDialog(this,
-                    "Booked " + roomId + " for " + userId + " (" + start + "-" + end + ").",
+                    confirmationMessage,
                     "Booking Confirmed", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this,

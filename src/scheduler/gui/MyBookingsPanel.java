@@ -36,7 +36,7 @@ public class MyBookingsPanel extends JPanel implements BookingObserver {
 
         this.facade = facade;
         this.tableModel = new DefaultTableModel(
-                new String[] {"Booking ID", "Room", "User", "Start", "End"},
+                new String[] {"Booking ID", "Room", "User", "Start", "End","Deposit", "Total Cost"},
                 0) {
             private static final long serialVersionUID = 1L;
 
@@ -108,12 +108,18 @@ public class MyBookingsPanel extends JPanel implements BookingObserver {
             Room room = facade.findRoom(booking.getRoomId());
             User user = facade.findUser(booking.getUserId());
 
+            String roleLabel = (user != null) ? user.getAccountType() : "Unknown";
+            double deposit = booking.getUpfrontDeposit();
+            double totalCost = booking.calculateTotalCost();
+
             tableModel.addRow(new Object[] {
                     booking.getId(),
                     room == null ? booking.getRoomId() : room.getId(),
                     user == null ? booking.getUserId() : user.getId(),
                     booking.getStartHour(),
-                    booking.getEndHour()
+                    booking.getEndHour(),
+                    String.format("$%.2f", deposit),
+                    String.format("$%.2f", totalCost)
             });
         }
     }
