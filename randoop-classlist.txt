@@ -1,0 +1,12 @@
+scheduler.model.Booking
+scheduler.model.BookingFactory
+scheduler.model.Room
+scheduler.model.TimeSlot
+scheduler.model.User
+scheduler.rules.NoOverlapRule
+scheduler.strategy.StudentPricingStrategy
+scheduler.strategy.FacultyPricingStrategy
+scheduler.strategy.StaffPricingStrategy
+scheduler.strategy.PartnerPricingStrategy
+scheduler.data.InMemoryBookingRepository
+scheduler.booking.BookingManager

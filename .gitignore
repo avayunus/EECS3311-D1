@@ -1,4 +1,6 @@
 bin/
+bin_check/
+target/
 *.class
 .metadata/
 .settings/
