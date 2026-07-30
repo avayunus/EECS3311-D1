@@ -10,11 +10,6 @@ import scheduler.rules.IConflictRules;
 /**
  * Singleton 
  *
- * There's one list of bookings and it saves to bookings.csv. If every view made
- * its own manager they'd each load their own copy and overwrite each other, and
- * conflict checking would break since neither one could see the other's
- * bookings
- *
  * Lazy init  
  */
 public class BookingManager implements BookingSubject {
@@ -39,7 +34,6 @@ public class BookingManager implements BookingSubject {
     }
 
     // call once at startup. repo and rules get passed in so this class
-    // doesn't care that we're using CSV
     public void initialize(IBookingRepository repo, IConflictRules rules) {
         this.repo = repo;
         this.rules = rules;
@@ -63,7 +57,7 @@ public class BookingManager implements BookingSubject {
         return true;
     }
 
-    // false if that id isn't there, so the caller knows nothing happened
+    // false if that id isn't there
     public boolean cancelBooking(String id) {
         requireInitialized();
         Booking found = findById(id);
@@ -76,8 +70,7 @@ public class BookingManager implements BookingSubject {
         return true;
     }
 
-    // copy, not the real list - otherwise a view could edit bookings
-    // directly and skip the conflict check
+    // copy, not the real list 
     public List<Booking> getBookings() {
         return new ArrayList<Booking>(bookings);
     }
@@ -105,8 +98,7 @@ public class BookingManager implements BookingSubject {
         observers.remove(o);
     }
 
-    // loop a copy, otherwise a view unregistering itself in its own callback
-    // blows up with ConcurrentModificationException
+    // loop a copy
     @Override
     public void notifyObservers() {
         for (BookingObserver o : new ArrayList<BookingObserver>(observers)) {
