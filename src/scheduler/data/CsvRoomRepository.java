@@ -29,8 +29,9 @@ public class CsvRoomRepository implements IRoomRepository {
         if (!file.exists()) {
             return;
         }
+        CsvReader reader = null;
         try {
-            CsvReader reader = new CsvReader(path);
+            reader = new CsvReader(path);
             reader.readHeaders();
             while (reader.readRecord()) {
                 String status = reader.get("status");
@@ -45,15 +46,20 @@ public class CsvRoomRepository implements IRoomRepository {
                         status.trim());
                 cache.add(room);
             }
-            reader.close();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to load rooms from " + path, e);
+        }
+        finally {
+            // This guarantees the file handle is released even when parsing crashes!
+            if (reader != null) {
+                reader.close();
+            }
         }
     }
 
     private void writeAll() {
         try {
-            CsvWriter writer = new CsvWriter(new FileWriter(path, false), ',');
+            CsvWriter  writer = new CsvWriter(new FileWriter(path, false), ',');
             writer.write("id");
             writer.write("name");
             writer.write("capacity");

@@ -34,8 +34,9 @@ public class CSVBookingAdapter implements IBookingRepository {
             return bookings;
         }
 
+        CsvReader reader = null;
         try {
-            CsvReader reader = new CsvReader(csvFilePath);
+            reader = new CsvReader(csvFilePath);
             reader.readHeaders();
             
             while (reader.readRecord()) {
@@ -67,9 +68,13 @@ public class CSVBookingAdapter implements IBookingRepository {
                         strategy);
                 bookings.add(booking);
             }
-            reader.close();
         } catch (Exception e) {
             throw new IllegalStateException("Adapter failed to read from data source: " + csvFilePath, e);
+        }finally {
+            // Enforce file closure under all circumstances to free OS file locks
+            if (reader != null) {
+                reader.close();
+            }
         }
         return bookings;
     }

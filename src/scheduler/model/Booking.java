@@ -51,4 +51,8 @@ public class Booking {
         return "Booking[" + id + " room=" + roomId + " user=" + userId
                 + " " + startHour + "-" + endHour + "]";
     }
+
+    public Object getPricingStrategy() {
+        return this.pricingStrategy;
+    }
 }

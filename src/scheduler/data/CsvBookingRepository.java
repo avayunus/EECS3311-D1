@@ -31,9 +31,9 @@ public class CsvBookingRepository implements IBookingRepository {
         File file = new File(path);
         if (!file.exists()) {
             return;
-        }
+        }CsvReader reader = null;
         try {
-            CsvReader reader = new CsvReader(path);
+            reader = new CsvReader(path);
             reader.readHeaders();
             while (reader.readRecord()) {
                 String userType = reader.get("userType");
@@ -63,9 +63,14 @@ public class CsvBookingRepository implements IBookingRepository {
                         strategy);
                 cache.add(booking);
             }
-            reader.close();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to load bookings from " + path, e);
+        }
+        finally {
+            // Enforce file closure under all circumstances to free OS file locks
+            if (reader != null) {
+                reader.close();
+            }
         }
     }
 

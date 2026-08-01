@@ -29,22 +29,41 @@ public class CsvUserRepository implements IUserRepository {
         if (!file.exists()) {
             return;
         }
+        CsvReader reader = null;
         try {
-            CsvReader reader = new CsvReader(path);
+            reader = new CsvReader(path);
             reader.readHeaders();
             while (reader.readRecord()) {
+                String id = reader.get("id");
+                String email = reader.get("email");
+                String password = reader.get("password");
+                String verifiedRaw = reader.get("verified");
+
+                // Check for null OR empty strings to catch missing columns that return ""
+                if (id == null || id.isBlank() ||
+                        email == null || email.isBlank() ||
+                        password == null || password.isBlank() ||
+                        verifiedRaw == null || verifiedRaw.isBlank()) {
+
+                    throw new IllegalArgumentException("Malformed row data: Required CSV columns are missing or blank.");
+                }
+
                 User user = new User(
-                        reader.get("id"),
-                        reader.get("email"),
-                        reader.get("password"),
+                        id,
+                        email,
+                        password,
                         reader.get("accountType"),
                         reader.get("orgOrStudentId"),
-                        Boolean.parseBoolean(reader.get("verified").trim()));
+                        Boolean.parseBoolean(verifiedRaw.trim()));
                 cache.add(user);
             }
-            reader.close();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to load users from " + path, e);
+        }finally {
+            // Enforce file closure to prevent Windows file-locking test teardown crashes!
+            if (reader != null) {
+                reader.close();
+            }
         }
     }
 
